@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 28px;
+            width: 420px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .display .expression {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            min-height: 20px;
+            word-break: break-all;
+            text-align: right;
+            width: 100%;
+        }
+
+        .display .result {
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: 600;
+            word-break: break-all;
+            text-align: right;
+            width: 100%;
+            line-height: 1.2;
+        }
+
+        .display .result.error {
+            color: #ff6b6b;
+            font-size: 18px;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .mode-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .btn-grid.hidden {
+            display: none;
+        }
+
+        .btn {
+            padding: 16px 8px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn:active {
+            transform: scale(0.94);
+        }
+
+        .btn-number {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+
+        .btn-number:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-op {
+            background: rgba(102, 126, 234, 0.25);
+            color: #a8b4ff;
+        }
+
+        .btn-op:hover {
+            background: rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-func {
+            background: rgba(118, 75, 162, 0.25);
+            color: #c9a0e8;
+            font-size: 13px;
+        }
+
+        .btn-func:hover {
+            background: rgba(118, 75, 162, 0.4);
+        }
+
+        .btn-action {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff8a8a;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 107, 107, 0.35);
+        }
+
+        .btn-equals {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-equals:hover {
+            background: linear-gradient(135deg, #7b91ee, #8a5fb5);
+        }
+
+        .btn-const {
+            background: rgba(46, 213, 115, 0.2);
+            color: #6ee59d;
+            font-size: 13px;
+        }
+
+        .btn-const:hover {
+            background: rgba(46, 213, 115, 0.35);
+        }
+
+        .btn-wide {
+            grid-column: span 2;
+        }
+
+        .history-section {
+            margin-top: 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .history-section.open {
+            max-height: 200px;
+        }
+
+        .history-toggle {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .history-toggle:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .history-list {
+            list-style: none;
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .history-list li {
+            padding: 8px 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-list li:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .history-list li .hist-expr {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .history-list li .hist-result {
+            color: #a8b4ff;
+            font-weight: 500;
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 460px) {
+            .calculator {
+                width: 100%;
+                padding: 20px;
+            }
+            .btn {
+                padding: 14px 6px;
+                font-size: 14px;
+            }
+            .display .result {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="expression" id="expression"></div>
+            <div class="result" id="result">0</div>
+        </div>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="basic">Basic</button>
+            <button class="mode-tab" data-mode="scientific">Scientific</button>
+            <button class="mode-tab" data-mode="trig">Trig</button>
+        </div>
+
+        <!-- Basic Mode -->
+        <div class="btn-grid" id="grid-basic">
+            <button class="btn btn-action" onclick="clearAll()">AC</button>
+            <button class="btn btn-action" onclick="backspace()">⌫</button>
+            <button class="btn btn-func" onclick="applyUnary('percent')">%</button>
+            <button class="btn btn-op" onclick="setOp('divide')">÷</button>
+
+            <button class="btn btn-number" onclick="appendNum('7')">7</button>
+            <button class="btn btn-number" onclick="appendNum('8')">8</button>
+            <button class="btn btn-number" onclick="appendNum('9')">9</button>
+            <button class="btn btn-op" onclick="setOp('multiply')">×</button>
+
+            <button class="btn btn-number" onclick="appendNum('4')">4</button>
+            <button class="btn btn-number" onclick="appendNum('5')">5</button>
+            <button class="btn btn-number" onclick="appendNum('6')">6</button>
+            <button class="btn btn-op" onclick="setOp('subtract')">−</button>
+
+            <button class="btn btn-number" onclick="appendNum('1')">1</button>
+            <button class="btn btn-number" onclick="appendNum('2')">2</button>
+            <button class="btn btn-number" onclick="appendNum('3')">3</button>
+            <button class="btn btn-op" onclick="setOp('add')">+</button>
+
+            <button class="btn btn-func" onclick="applyUnary('negate')">±</button>
+            <button class="btn btn-number" onclick="appendNum('0')">0</button>
+            <button class="btn btn-number" onclick="appendNum('.')">.</button>
+            <button class="btn btn-equals" onclick="compute()">=</button>
+        </div>
+
+        <!-- Scientific Mode -->
+        <div class="btn-grid hidden" id="grid-scientific">
+            <button class="btn btn-func" onclick="applyUnary('square')">x²</button>
+            <button class="btn btn-func" onclick="applyUnary('cube')">x³</button>
+            <button class="btn btn-func" onclick="setOp('power')">xʸ</button>
+            <button class="btn btn-func" onclick="applyUnary('exp')">eˣ</button>
+
+            <button class="btn btn-func" onclick="applyUnary('sqrt')">√x</button>
+            <button class="btn btn-func" onclick="applyUnary('cbrt')">∛x</button>
+            <button class="btn btn-func" onclick="applyUnary('reciprocal')">1/x</button>
+            <button class="btn btn-func" onclick="applyUnary('abs')">|x|</button>
+
+            <button class="btn btn-func" onclick="applyUnary('ln')">ln</button>
+            <button class="btn btn-func" onclick="applyUnary('log10')">log₁₀</button>
+            <button class="btn btn-func" onclick="applyUnary('log2')">log₂</button>
+            <button class="btn btn-func" onclick="applyUnary('factorial')">n!</button>
+
+            <button class="btn btn-func" onclick="applyUnary('floor')">⌊x⌋</button>
+            <button class="btn btn-func" onclick="applyUnary('ceil')">⌈x⌉</button>
+            <button class="btn btn-func" onclick="applyUnary('round')">rnd</button>
+            <button class="btn btn-func" onclick="setOp('modulo')">mod</button>
+
+            <button class="btn btn-const" onclick="insertConst('pi')">π</button>
+            <button class="btn btn-const" onclick="insertConst('e')">e</button>
+            <button class="btn btn-const" onclick="insertConst('tau')">τ</button>
+            <button class="btn btn-equals" onclick="compute()">=</button>
+        </div>
+
+        <!-- Trig Mode -->
+        <div class="btn-grid hidden" id="grid-trig">
+            <button class="btn btn-func" onclick="applyUnary('sin')">sin</button>
+            <button class="btn btn-func" onclick="applyUnary('cos')">cos</button>
+            <button class="btn btn-func" onclick="applyUnary('tan')">tan</button>
+            <button class="btn btn-op" onclick="setOp('divide')">÷</button>
+
+            <button class="btn btn-func" onclick="applyUnary('asin')">sin⁻¹</button>
+            <button class="btn btn-func" onclick="applyUnary('acos')">cos⁻¹</button>
+            <button class="btn btn-func" onclick="applyUnary('atan')">tan⁻¹</button>
+            <button class="btn btn-op" onclick="setOp('multiply')">×</button>
+
+            <button class="btn btn-func" onclick="applyUnary('sinh')">sinh</button>
+            <button class="btn btn-func" onclick="applyUnary('cosh')">cosh</button>
+            <button class="btn btn-func" onclick="applyUnary('tanh')">tanh</button>
+            <button class="btn btn-op" onclick="setOp('subtract')">−</button>
+
+            <button class="btn btn-number" onclick="appendNum('1')">1</button>
+            <button class="btn btn-number" onclick="appendNum('2')">2</button>
+            <button class="btn btn-number" onclick="appendNum('3')">3</button>
+            <button class="btn btn-op" onclick="setOp('add')">+</button>
+
+            <button class="btn btn-number" onclick="appendNum('4')">4</button>
+            <button class="btn btn-number" onclick="appendNum('5')">5</button>
+            <button class="btn btn-number" onclick="appendNum('6')">6</button>
+            <button class="btn btn-equals" onclick="compute()">=</button>
+        </div>
+
+        <button class="history-toggle" onclick="toggleHistory()">History ▾</button>
+        <div class="history-section" id="historySection">
+            <ul class="history-list" id="historyList"></ul>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = "0";
+        let operator = null;
+        let operandA = null;
+        let justComputed = false;
+        let history = [];
+
+        const resultEl = document.getElementById("result");
+        const exprEl = document.getElementById("expression");
+
+        const OP_LABELS = {
+            add: "+", subtract: "−", multiply: "×",
+            divide: "÷", power: "^", modulo: "mod"
+        };
+
+        function updateDisplay() {
+            resultEl.textContent = currentInput;
+            resultEl.classList.remove("error");
+        }
+
+        function showError(msg) {
+            resultEl.textContent = msg;
+            resultEl.classList.add("error");
+        }
+
+        function appendNum(n) {
+            if (justComputed) {
+                currentInput = "0";
+                justComputed = false;
+            }
+            if (n === "." && currentInput.includes(".")) return;
+            if (currentInput === "0" && n !== ".") {
+                currentInput = n;
+            } else {
+                currentInput += n;
+            }
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = "0";
+            operator = null;
+            operandA = null;
+            justComputed = false;
+            exprEl.textContent = "";
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (justComputed) return;
+            currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : "0";
+            updateDisplay();
+        }
+
+        function setOp(op) {
+            operandA = currentInput;
+            operator = op;
+            exprEl.textContent = `${operandA} ${OP_LABELS[op] || op}`;
+            currentInput = "0";
+            justComputed = false;
+            updateDisplay();
+        }
+
+        async function compute() {
+            if (!operator || operandA === null) return;
+            const payload = { operation: operator, a: operandA, b: currentInput };
+            const expression = `${operandA} ${OP_LABELS[operator] || operator} ${currentInput}`;
+
+            try {
+                const res = await fetch("/calculate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    exprEl.textContent = expression + " =";
+                    currentInput = String(data.result);
+                    updateDisplay();
+                    addHistory(expression, data.result);
+                } else {
+                    showError(data.error);
+                }
+            } catch (e) {
+                showError("Connection error");
+            }
+            justComputed = true;
+            operator = null;
+            operandA = null;
+        }
+
+        async function applyUnary(op) {
+            const val = currentInput;
+            const UNARY_LABELS = {
+                sqrt: "√", cbrt: "∛", abs: "|x|", factorial: "!",
+                ln: "ln", log10: "log₁₀", log2: "log₂", exp: "eˣ",
+                floor: "⌊⌋", ceil: "⌈⌉", round: "rnd", reciprocal: "1/x",
+                square: "x²", cube: "x³", negate: "±", percent: "%",
+                sin: "sin", cos: "cos", tan: "tan",
+                asin: "sin⁻¹", acos: "cos⁻¹", atan: "tan⁻¹",
+                sinh: "sinh", cosh: "cosh", tanh: "tanh"
+            };
+            const label = UNARY_LABELS[op] || op;
+            const expression = `${label}(${val})`;
+
+            try {
+                const res = await fetch("/calculate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ operation: op, a: val, b: null })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    exprEl.textContent = expression + " =";
+                    currentInput = String(data.result);
+                    updateDisplay();
+                    addHistory(expression, data.result);
+                } else {
+                    showError(data.error);
+                }
+            } catch (e) {
+                showError("Connection error");
+            }
+            justComputed = true;
+        }
+
+        async function insertConst(name) {
+            try {
+                const res = await fetch("/calculate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ operation: name, a: null, b: null })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    currentInput = String(data.result);
+                    exprEl.textContent = name;
+                    updateDisplay();
+                }
+            } catch (e) {
+                showError("Connection error");
+            }
+            justComputed = true;
+        }
+
+        function addHistory(expr, result) {
+            history.unshift({ expr, result });
+            if (history.length > 20) history.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById("historyList");
+            list.innerHTML = history.map(h =>
+                `<li onclick="loadFromHistory('${h.result}')">
+                    <span class="hist-expr">${h.expr}</span>
+                    <span class="hist-result">= ${h.result}</span>
+                </li>`
+            ).join("");
+        }
+
+        function loadFromHistory(val) {
+            currentInput = String(val);
+            justComputed = true;
+            updateDisplay();
+        }
+
+        function toggleHistory() {
+            document.getElementById("historySection").classList.toggle("open");
+        }
+
+        // Mode switching
+        document.querySelectorAll(".mode-tab").forEach(tab => {
+            tab.addEventListener("click", () => {
+                document.querySelectorAll(".mode-tab").forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                document.querySelectorAll(".btn-grid").forEach(g => g.classList.add("hidden"));
+                document.getElementById("grid-" + tab.dataset.mode).classList.remove("hidden");
+            });
+        });
+
+        // Keyboard support
+        document.addEventListener("keydown", (e) => {
+            if (e.key >= "0" && e.key <= "9") appendNum(e.key);
+            else if (e.key === ".") appendNum(".");
+            else if (e.key === "+") setOp("add");
+            else if (e.key === "-") setOp("subtract");
+            else if (e.key === "*") setOp("multiply");
+            else if (e.key === "/") { e.preventDefault(); setOp("divide"); }
+            else if (e.key === "^") setOp("power");
+            else if (e.key === "Enter" || e.key === "=") compute();
+            else if (e.key === "Backspace") backspace();
+            else if (e.key === "Escape") clearAll();
+        });
+    </script>
+</body>
+</html>
