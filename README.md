@@ -25,6 +25,6 @@ Then run the application:
 
 python app.py
 
-Finally, open it in your browser:
+Open it in your browser:
 
 http://localhost:5000
