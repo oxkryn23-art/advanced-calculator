@@ -15,7 +15,7 @@ View and reuse previous results
 Keyboard support
 The calculator can be fully controlled using the keyboard
 
-Setup
+Setup:
 
 First, install the dependencies:
 
