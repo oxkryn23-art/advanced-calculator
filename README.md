@@ -1,20 +1,30 @@
-# Advanced Python Calculator
+Features
 
-A Flask-based calculator with a modern glassmorphism UI featuring basic, scientific, and trigonometric modes.
+Basic mode:
+Addition, subtraction, multiplication, division, percentages, and sign toggle
 
-## Features
+Scientific mode:
+Powers (², ³, xʸ), roots, reciprocal, absolute value, factorial, logarithms (ln, log₁₀, log₂), exponential functions (eˣ), rounding (floor, ceil, round), modulo, and constants (π, e, τ)
 
-- **Basic Mode**: Addition, subtraction, multiplication, division, percentage, sign toggle
-- **Scientific Mode**: Square, cube, power, sqrt, cube root, reciprocal, absolute value, factorial, ln, log₁₀, log₂, eˣ, floor, ceil, round, modulo, constants (π, e, τ)
-- **Trigonometric Mode**: sin, cos, tan, arcsin, arccos, arctan, sinh, cosh, tanh (degrees)
-- **History**: View and reuse past calculations
-- **Keyboard Support**: Full keyboard input
+Trigonometric mode:
+sin, cos, tan along with inverse functions (arcsin, arccos, arctan) and hyperbolic functions (sinh, cosh, tanh) – all in degrees
 
-## Setup
+Calculation history
+View and reuse previous results
 
-```bash
+Keyboard support
+The calculator can be fully controlled using the keyboard
+
+Setup
+
+First, install the dependencies:
+
 pip install -r requirements.txt
-python app.py
-```
 
-Then open http://localhost:5000 in your browser.
+Then run the application:
+
+python app.py
+
+Finally, open it in your browser:
+
+http://localhost:5000
