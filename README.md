@@ -1,30 +1,39 @@
-Features
+# Advanced Calculator
 
-Basic mode:
-Addition, subtraction, multiplication, division, percentages, and sign toggle
+A web calculator with basic, scientific and trigonometric modes, built with Python (Flask) and vanilla JavaScript.
+The math runs on the server through a small JSON API.
 
-Scientific mode:
-Powers (², ³, xʸ), roots, reciprocal, absolute value, factorial, logarithms (ln, log₁₀, log₂), exponential functions (eˣ), rounding (floor, ceil, round), modulo, and constants (π, e, τ)
+## Features
 
-Trigonometric mode:
-sin, cos, tan along with inverse functions (arcsin, arccos, arctan) and hyperbolic functions (sinh, cosh, tanh) – all in degrees
+- **Basic mode:** addition, subtraction, multiplication, division, percentages and sign toggle
+- **Scientific mode:** powers (x², x³, xʸ), roots, reciprocal, absolute value, factorial, logarithms (ln, log₁₀,
+  log₂), the exponential eˣ, rounding (floor, ceil, round), modulo and the constants π, e and τ
+- **Trigonometric mode:** sin, cos, tan, their inverses (arcsin, arccos, arctan) and the hyperbolic functions (sinh,
+  cosh, tanh), all in degrees
+- **Calculation history:** view and reuse previous results
+- **Keyboard support:** the whole calculator can be used from the keyboard
+- **Error handling:** division by zero and invalid input return a clear message
 
-Calculation history
-View and reuse previous results
+## Quick start
 
-Keyboard support
-The calculator can be fully controlled using the keyboard
-
-Setup:
-
-First, install the dependencies:
-
+```bash
 pip install -r requirements.txt
-
-Then run the application:
-
 python app.py
+```
 
-Open it in your browser:
+Then open http://localhost:5000 in your browser.
 
-http://localhost:5000
+## Tech stack
+
+- Python 3 + Flask (the `/calculate` JSON endpoint)
+- HTML, CSS and vanilla JavaScript (the interface)
+
+## Project structure
+
+```
+advanced-calculator/
+├── app.py              # Flask server and the calculation API
+├── requirements.txt
+└── templates/
+    └── index.html      # the calculator interface
+```
